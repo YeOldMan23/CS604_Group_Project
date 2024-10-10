@@ -10,5 +10,8 @@ CLASS_ENCODING = {
     8: "aorta"
 }
 
+SEED = 1234
+
 LEARNING_RATE = 0.001
 NUM_EPOCHS    = 100
+BATCH_SIZE    = 1
