@@ -35,13 +35,11 @@ def calculate_metrics_by_pixel(pred : torch.Tensor, actual : torch.Tensor, thres
         IoU = TP / (TP + FP + FN) if (TP + FP + FN) > 0 else 0.0
         precision = TP / (TP + FP) if (TP + FP) > 0 else 0.0
         recall = TP / (TP + FN) if (TP + FN) > 0 else 0.0
-        accuracy = (TP + TN) / (TP + FP + FN + TN)
 
-        # Put in dictionary
-        metrics_dict[i]["IoU"] = IoU
-        metrics_dict[i]["Recall"] = recall
-        metrics_dict[i]["Precision"] = precision
-        metrics_dict[i]["Accuracy"] = accuracy
+        # Put in dictionary, adjust for removal of BG Class
+        metrics_dict[i+1]["IoU"] = IoU
+        metrics_dict[i+1]["Recall"] = recall
+        metrics_dict[i+1]["Precision"] = precision
 
     return metrics_dict
 
@@ -53,10 +51,9 @@ def print_metrics(metrics_table : dict) -> None:
         class_metrics = [class_name,
                          metrics_table[i]["IoU"],
                          metrics_table[i]["Recall"],
-                         metrics_table[i]["Precision"],
-                         metrics_table[i]["Accuracy"]]
+                         metrics_table[i]["Precision"]]
         
         metrics_list.append(class_metrics)
 
-    print(tabulate(metrics_list, headers=["Class Name", "IoU", "Recall", "Precision", "Accuracy"]))
+    print(tabulate(metrics_list, headers=["Class Name", "IoU", "Recall", "Precision"]))
 

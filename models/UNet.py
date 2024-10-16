@@ -1,8 +1,6 @@
 from segmentation_models_pytorch import Unet
 
-from ..utils.globals import CLASS_ENCODING
-
-num_classes = len(CLASS_ENCODING.keys())
+num_classes = 8
 
 aux_params = {
     "classes": num_classes,
@@ -14,6 +12,7 @@ unet_model = Unet(
     encoder_name = "resnet34",
     classes = num_classes,
     in_channels = 1,       # Input image is grey
+    dropout = 0.2,
     activation = "softmax", # Softmax because only once class per pixel
     aux_params = aux_params
 )

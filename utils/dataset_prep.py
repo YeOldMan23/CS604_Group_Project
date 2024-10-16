@@ -27,7 +27,7 @@ class MedicalDataset(Dataset):
         """
         Conver the number based mask to one hot encoding
         """
-        output_channels = len(CLASS_ENCODING)
+        output_channels = len(CLASS_ENCODING) # Remove the class index 
 
         input_mask  = cv2.imread(number_based_mask, cv2.IMREAD_GRAYSCALE)
         output_mask = np.zeros((input_mask.shape[0], input_mask.shape[1], output_channels), dtype=np.int8)
@@ -35,7 +35,7 @@ class MedicalDataset(Dataset):
         # Convert the masks to one hot encoding
         for class_index in CLASS_ENCODING.keys():
             class_mask = (input_mask == class_index).astype(int)
-            output_mask[:, :, class_index] = class_mask
+            output_mask[:, :, class_index - 1] = class_mask # Adjust for the class encoding
 
         return output_mask
     

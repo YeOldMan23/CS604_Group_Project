@@ -1,25 +1,44 @@
 import torch
 
 class FocalTverskyLoss(torch.nn.Module):
-    def __init__(self, beta = 0.3, gamma = 4/3, smooth = 1e-4, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.beta  = beta
-        self.gamma = gamma
+    def __init__(
+        self,
+        weight=None,
+        size_average=True,
+        alpha=0.6,
+        beta=0.4,
+        smooth=1,
+        gamma=4 / 3,
+        class_weights=None,
+    ):
+        super(FocalTverskyLoss, self).__init__()
+        self.name = "Focal Tversky Loss"
+        self.alpha = alpha
+        self.beta = beta
         self.smooth = smooth
+        self.gamma = gamma
+        self.class_weights = class_weights
 
-    def forward(self, preds, target):
-        preds = preds.view(-1)
-        target = target.view(-1)
+        # Keep BG weight at 1
+        if self.class_weights is not None:
+            self.class_weights[-1] = 1.0
 
-        true_pos = torch.sum(preds * target)
-        false_neg = torch.sum(preds * (1-target))
-        false_pos = torch.sum((1-preds)*target)
+            self.no_class = len(class_weights)
 
-        # Calculate tversky loss first
-        tversky = (true_pos + self.smooth)/(true_pos + self.beta *false_neg + (1-self.beta)*false_pos + self.smooth)
-        tversky_loss = 1 - tversky
+    def forward(self, inputs, targets):
+        # Ok for multiclass multilabel since the entire image becomes the same dimensions
+        class_input = inputs.view(-1)
+        class_target = targets.view(-1)
 
-        focal_tversky_loss = torch.pow(1 - tversky_loss, 1 / self.gamma)
-        
-        return focal_tversky_loss
+        # True Positive, False Negative
+        TP = (class_input * class_target).sum()
+        FP = ((1 - class_target) * class_input).sum()
+        FN = (class_target * (1 - class_input)).sum()
+
+        Tversky = (TP + self.smooth) / (
+            TP + self.alpha * FP + self.beta * FN + self.smooth
+        )
+
+        FocalTversky = (1 - Tversky) ** (1 / self.gamma)
+
+        return FocalTversky

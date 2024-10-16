@@ -1,5 +1,5 @@
 CLASS_ENCODING = {
-    0: "background",
+    # 0: "background", Ignore Background
     1: "spleen",
     2: "right_kidney",
     3: "left_kidney",
@@ -12,6 +12,6 @@ CLASS_ENCODING = {
 
 SEED = 1234
 
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.0001
 NUM_EPOCHS    = 100
 BATCH_SIZE    = 1

@@ -1,6 +1,6 @@
 from segmentation_models_pytorch import UnetPlusPlus
 
-num_classes = 9
+num_classes = 8 # Exclude BG
 
 aux_params = {
     "classes": num_classes,

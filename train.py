@@ -42,7 +42,7 @@ model.to(device)
 optimizer = optim.Adam(model.parameters(), lr = LEARNING_RATE)
 combo_loss = [torch.nn.BCELoss(), FocalTverskyLoss()]
 combo_weights = [0.3, 0.7]
-scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=0.9, verbose=True)
+scheduler = lr_scheduler.LambdaLR(optimizer, gamma=0.9)
 
 # Loss List to keep
 train_loss_list = []
@@ -69,13 +69,11 @@ for num_epoch in range(1, NUM_EPOCHS):
     model.train()
     # Do the training part first
     for inputs, targets in train_pbar:
-        inputs, targets = inputs.to(device), targets.to(device)
+        inputs, targets = inputs.to(device), targets.to(torch.float32).to(device)
 
         predictions, class_preds = model(inputs)
 
         cur_loss = 0
-        value_mask = (targets < 0) | (targets > 1)
-        print(value_mask.sum().item())
 
         for loss, weight in zip(combo_loss, combo_weights):
             cur_loss += weight * loss(predictions, targets)
@@ -88,14 +86,13 @@ for num_epoch in range(1, NUM_EPOCHS):
         # Calculate the metrics
         cur_metrics = calculate_metrics_by_pixel(predictions, targets)
 
-        train_pbar.set_description(f"Epoch {num_epoch} | Loss : {cur_loss.item():.5f}")
+        train_pbar.set_description(f"Epoch {num_epoch} | Training Loss : {cur_loss.item():.5f}")
 
         # append the metrics to the epoch list
         for i in CLASS_ENCODING.keys():
             epoch_train_dict[i]["IoU"] += cur_metrics[i]["IoU"]
             epoch_train_dict[i]["Precision"] += cur_metrics[i]["Precision"]
             epoch_train_dict[i]["Recall"] += cur_metrics[i]["Recall"]
-            epoch_train_dict[i]["Accuracy"] += cur_metrics[i]["Accuracy"]
 
     # Normalize to the size of dataloader
     epoch_train_loss /= len(train_pbar)
@@ -103,7 +100,6 @@ for num_epoch in range(1, NUM_EPOCHS):
         epoch_train_dict[i]["IoU"] /= len(train_pbar)
         epoch_train_dict[i]["Precision"] /= len(train_pbar)
         epoch_train_dict[i]["Recall"] /= len(train_pbar)
-        epoch_train_dict[i]["Accuracy"] /= len(train_pbar)
 
     print("Training Metrics :")
     print_metrics(epoch_train_dict)
@@ -111,7 +107,7 @@ for num_epoch in range(1, NUM_EPOCHS):
     model.eval()
     # Test part
     for inputs, targets in test_pbar:
-        inputs, targets = inputs.to(device), targets.to(device)
+        inputs, targets = inputs.to(device), targets.to(torch.float32).to(device)
 
         predictions, class_preds = model(inputs)
         cur_loss = 0
@@ -123,14 +119,13 @@ for num_epoch in range(1, NUM_EPOCHS):
         # Calculate the metrics
         cur_metrics = calculate_metrics_by_pixel(predictions, targets)
 
-        test_pbar.set_description(f"Epoch {num_epoch} | Loss : {cur_loss.item():.5f}")
+        test_pbar.set_description(f"Epoch {num_epoch} | Testing Loss : {cur_loss.item():.5f}")
 
         # append the metrics to the epoch list
         for i in CLASS_ENCODING.keys():
             epoch_test_dict[i]["IoU"] += cur_metrics[i]["IoU"]
             epoch_test_dict[i]["Precision"] += cur_metrics[i]["Precision"]
             epoch_test_dict[i]["Recall"] += cur_metrics[i]["Recall"]
-            epoch_test_dict[i]["Accuracy"] += cur_metrics[i]["Accuracy"]
 
     # Normalize to the size of dataloader
     epoch_test_loss /= len(test_pbar)
@@ -138,7 +133,6 @@ for num_epoch in range(1, NUM_EPOCHS):
         epoch_test_dict[i]["IoU"] /= len(test_pbar)
         epoch_test_dict[i]["Precision"] /= len(test_pbar)
         epoch_test_dict[i]["Recall"] /= len(test_pbar)
-        epoch_test_dict[i]["Accuracy"] /= len(test_pbar)
 
     print("Testing Metrics :")
     print_metrics(epoch_test_dict)
@@ -149,4 +143,5 @@ for num_epoch in range(1, NUM_EPOCHS):
     train_metrics_dict_list.append(epoch_train_dict)
     test_metrics_dict_list.append(epoch_test_dict)
 
-    scheduler.step()
+    scheduler.step(num_epoch)
+    scheduler.get_last_lr()
