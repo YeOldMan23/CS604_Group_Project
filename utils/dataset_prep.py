@@ -27,15 +27,26 @@ class MedicalDataset(Dataset):
         """
         Conver the number based mask to one hot encoding
         """
-        output_channels = len(CLASS_ENCODING) # Remove the class index 
+        base_channels = len(CLASS_ENCODING) # Remove the class index 
+        output_channels = len(NEW_CLASS_ENCODING)
 
         input_mask  = cv2.imread(number_based_mask, cv2.IMREAD_GRAYSCALE)
+        base_mask = np.zeros((input_mask.shape[0], input_mask.shape[1], base_channels), dtype=np.int8)
         output_mask = np.zeros((input_mask.shape[0], input_mask.shape[1], output_channels), dtype=np.int8)
 
         # Convert the masks to one hot encoding
         for class_index in CLASS_ENCODING.keys():
             class_mask = (input_mask == class_index).astype(int)
-            output_mask[:, :, class_index - 1] = class_mask # Adjust for the class encoding
+            base_mask[:, :, class_index] = class_mask # Adjust for the class encoding
+
+        # Combine the left and right kidney into one class kidney, drop background mask
+        output_mask[:, :, 0] = base_mask[:, :, 1]
+        output_mask[:, :, 1] = base_mask[:, :, 2] + base_mask[:, :, 3]
+        output_mask[:, :, 2] = base_mask[:, :, 4]
+        output_mask[:, :, 3] = base_mask[:, :, 5]
+        output_mask[:, :, 4] = base_mask[:, :, 6]
+        output_mask[:, :, 5] = base_mask[:, :, 7]
+        output_mask[:, :, 6] = base_mask[:, :, 8]
 
         return output_mask
     

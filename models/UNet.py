@@ -1,6 +1,6 @@
 from segmentation_models_pytorch import Unet
 
-num_classes = 8
+num_classes = 7
 
 aux_params = {
     "classes": num_classes,

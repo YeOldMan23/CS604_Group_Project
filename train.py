@@ -42,7 +42,7 @@ model.to(device)
 optimizer = optim.Adam(model.parameters(), lr = LEARNING_RATE)
 combo_loss = [torch.nn.BCELoss(), FocalTverskyLoss()]
 combo_weights = [0.3, 0.7]
-scheduler = lr_scheduler.LambdaLR(optimizer, gamma=0.9)
+scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=0.5)
 
 # Loss List to keep
 train_loss_list = []
@@ -62,7 +62,7 @@ for num_epoch in range(1, NUM_EPOCHS):
     epoch_test_dict  = {}
 
     # Initialize the metrics dictionary
-    for class_name in CLASS_ENCODING.keys():
+    for class_name in NEW_CLASS_ENCODING.keys():
         epoch_test_dict[class_name]  = {"IoU": 0, "Precision": 0, "Recall": 0, "Accuracy": 0}
         epoch_train_dict[class_name] = {"IoU": 0, "Precision": 0, "Recall": 0, "Accuracy": 0}
 
@@ -74,6 +74,7 @@ for num_epoch in range(1, NUM_EPOCHS):
         predictions, class_preds = model(inputs)
 
         cur_loss = 0
+        optimizer.zero_grad()
 
         for loss, weight in zip(combo_loss, combo_weights):
             cur_loss += weight * loss(predictions, targets)
@@ -89,14 +90,14 @@ for num_epoch in range(1, NUM_EPOCHS):
         train_pbar.set_description(f"Epoch {num_epoch} | Training Loss : {cur_loss.item():.5f}")
 
         # append the metrics to the epoch list
-        for i in CLASS_ENCODING.keys():
+        for i in NEW_CLASS_ENCODING.keys():
             epoch_train_dict[i]["IoU"] += cur_metrics[i]["IoU"]
             epoch_train_dict[i]["Precision"] += cur_metrics[i]["Precision"]
             epoch_train_dict[i]["Recall"] += cur_metrics[i]["Recall"]
 
     # Normalize to the size of dataloader
     epoch_train_loss /= len(train_pbar)
-    for i in CLASS_ENCODING.keys():
+    for i in NEW_CLASS_ENCODING.keys():
         epoch_train_dict[i]["IoU"] /= len(train_pbar)
         epoch_train_dict[i]["Precision"] /= len(train_pbar)
         epoch_train_dict[i]["Recall"] /= len(train_pbar)
@@ -122,14 +123,14 @@ for num_epoch in range(1, NUM_EPOCHS):
         test_pbar.set_description(f"Epoch {num_epoch} | Testing Loss : {cur_loss.item():.5f}")
 
         # append the metrics to the epoch list
-        for i in CLASS_ENCODING.keys():
+        for i in NEW_CLASS_ENCODING.keys():
             epoch_test_dict[i]["IoU"] += cur_metrics[i]["IoU"]
             epoch_test_dict[i]["Precision"] += cur_metrics[i]["Precision"]
             epoch_test_dict[i]["Recall"] += cur_metrics[i]["Recall"]
 
     # Normalize to the size of dataloader
     epoch_test_loss /= len(test_pbar)
-    for i in CLASS_ENCODING.keys():
+    for i in NEW_CLASS_ENCODING.keys():
         epoch_test_dict[i]["IoU"] /= len(test_pbar)
         epoch_test_dict[i]["Precision"] /= len(test_pbar)
         epoch_test_dict[i]["Recall"] /= len(test_pbar)

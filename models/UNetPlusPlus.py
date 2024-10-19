@@ -1,17 +1,20 @@
 from segmentation_models_pytorch import UnetPlusPlus
 
-num_classes = 8 # Exclude BG
+num_classes = 7 # Exclude BG, combine left and right kidney into 1
 
 aux_params = {
+    "pooling": "max",
     "classes": num_classes,
     "pooling": "max",
-    "activation": "sigmoid" # Each mask can have multiple classes
+    "dropout" : 0.2,
+    "activation" : "sigmoid" # Each mask can have multiple classes
 }
 
 unet_plus_plus_model = UnetPlusPlus(
-    encoder_name = "resnet34",
+    encoder_name = "resnet50",
     classes = num_classes,
     in_channels = 1,       # Input image is grey
     activation = "softmax", # Softmax because only once class per pixel
+    # decoder_attention_type = "scse",
     aux_params = aux_params
 )

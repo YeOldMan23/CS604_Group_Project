@@ -35,9 +35,14 @@ class ImageAndMasksTransforms():
             mask = transforms.ToTensor()(mask)
             image = transforms.ToTensor()(image)
 
+            # Random Crop the image to thatsize
+            # i, j, h, w = transforms.RandomCrop.get_params(image, output_size=self.resize_shape)
+            # image = F.crop(image, i, j, h, w)
+            # mask  = F.crop(mask, i, j, h, w)
+
             # Resize to 224, 224
-            image = transforms.Resize(self.resize_shape)(image)
-            mask  = transforms.Resize(self.resize_shape)(mask)
+            # image = transforms.Resize(self.resize_shape)(image)
+            # mask  = transforms.Resize(self.resize_shape)(mask)
 
             return image, mask
 

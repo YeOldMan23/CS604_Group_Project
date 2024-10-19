@@ -6,16 +6,16 @@ import torch
 from tabulate import tabulate
 from typing import Union
 
-from .globals import CLASS_ENCODING
+from .globals import NEW_CLASS_ENCODING
 
 def calculate_metrics_by_pixel(pred : torch.Tensor, actual : torch.Tensor, threshold: float = 0.7):
     metrics_dict = {}
 
-    for class_name in CLASS_ENCODING.keys():
+    for class_name in NEW_CLASS_ENCODING.keys():
         metrics_dict[class_name] = {}
 
     # Calculate IoU by class
-    for i in range(len(CLASS_ENCODING.keys())):
+    for i in range(len(NEW_CLASS_ENCODING.keys())):
         pred_class = pred[:, i, :, :]
         acutal_class = actual[:, i, :, :]
 
@@ -36,17 +36,17 @@ def calculate_metrics_by_pixel(pred : torch.Tensor, actual : torch.Tensor, thres
         precision = TP / (TP + FP) if (TP + FP) > 0 else 0.0
         recall = TP / (TP + FN) if (TP + FN) > 0 else 0.0
 
-        # Put in dictionary, adjust for removal of BG Class
-        metrics_dict[i+1]["IoU"] = IoU
-        metrics_dict[i+1]["Recall"] = recall
-        metrics_dict[i+1]["Precision"] = precision
+        # Put in dictionary
+        metrics_dict[i]["IoU"] = IoU
+        metrics_dict[i]["Recall"] = recall
+        metrics_dict[i]["Precision"] = precision
 
     return metrics_dict
 
 def print_metrics(metrics_table : dict) -> None:
     metrics_list = []
     for i in metrics_table.keys():
-        class_name = CLASS_ENCODING[i]
+        class_name = NEW_CLASS_ENCODING[i]
 
         class_metrics = [class_name,
                          metrics_table[i]["IoU"],
