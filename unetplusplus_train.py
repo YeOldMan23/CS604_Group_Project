@@ -42,7 +42,7 @@ model.to(device)
 optimizer = optim.Adam(model.parameters(), lr = LEARNING_RATE)
 combo_loss = [torch.nn.BCELoss(), FocalTverskyLoss()]
 combo_weights = [0.3, 0.7]
-scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=0.5)
+scheduler = lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
 
 # Loss List to keep
 train_loss_list = []

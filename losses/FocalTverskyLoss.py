@@ -1,4 +1,7 @@
 import torch
+import sys
+
+# Add the sys to the s
 
 class FocalTverskyLoss(torch.nn.Module):
     def __init__(
@@ -21,8 +24,6 @@ class FocalTverskyLoss(torch.nn.Module):
 
         # Keep BG weight at 1
         if self.class_weights is not None:
-            self.class_weights[-1] = 1.0
-
             self.no_class = len(class_weights)
 
     def forward(self, inputs, targets):
