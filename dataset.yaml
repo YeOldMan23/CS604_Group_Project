@@ -1,0 +1,14 @@
+# Train/val/test sets as 1) dir: path/to/imgs, 2) file: path/to/imgs.txt, or 3) list: [path/to/imgs1, path/to/imgs2, ..]
+path: /home/kieren/SMU_MITB/CS604/Assignments/Group_Project/CS604_Group_Project/data/yolo # dataset root dir
+train: train # train images
+val: test # val images
+
+# Classes (80 COCO classes)
+names:
+  0: spleen
+  1: kidney
+  2: gallbladder
+  3: pancreas
+  4: liver
+  5: stomach
+  6: aorta
