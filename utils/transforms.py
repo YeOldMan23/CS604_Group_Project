@@ -9,10 +9,12 @@ import random
 from .globals import SEED
 
 class ImageAndMasksTransforms():
-    def __init__(self, resize_shape = (224, 224), hflip_prob : float = 0.5, vflip_prob : float = 0.5, is_train = False) -> None:
+    def __init__(self, mean : float, std_dev : float, resize_shape = (224, 224), hflip_prob : float = 0.5, vflip_prob : float = 0.5, is_train = False) -> None:
         self.resize_shape = resize_shape
 
         # transforms and their probs
+        self.mean            = mean
+        self.std_dev         = std_dev
         self.gaussian_noise  = transforms.GaussianBlur((3, 3))
         self.hflip_prob      = hflip_prob
         self.vflip_prob      = vflip_prob
@@ -67,5 +69,8 @@ class ImageAndMasksTransforms():
 
         # Make the image and mask both Tensors
         image = transforms.ToTensor()(image)
+
+        # Normalize
+        image = transforms.Normalize(mean = self.mean, std= self.std_dev)(image)
 
         return image, mask

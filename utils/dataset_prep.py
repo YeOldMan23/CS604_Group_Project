@@ -78,6 +78,8 @@ def medical_train_eval_split(images_dir, masks_dir, train_split : float = 0.9):
     length_train  = int(len(images_list) * train_split)
     indexes       = [i for i in range(len(images_list))]
 
+    np.random.seed(42)
+
     train_indexes = np.random.choice(indexes, length_train, replace=False)
     test_indexes  = [j for j in indexes if j not in set(train_indexes)]
 
@@ -86,10 +88,31 @@ def medical_train_eval_split(images_dir, masks_dir, train_split : float = 0.9):
     train_masks_list  = [os.path.join(masks_dir, masks_list[k]) for k in train_indexes]
     test_images_list  = [os.path.join(images_dir, images_list[k]) for k in test_indexes]
     test_masks_list   = [os.path.join(masks_dir, masks_list[k]) for k in test_indexes]
+
+    # Get the normalizing factor
+    train_place_holder = None
+    test_place_holder  = None
+    for i in train_images_list:
+        if train_place_holder is None:
+            train_place_holder = cv2.imread(i)
+        else:
+            train_place_holder += cv2.imread(i)
+    
+    for i in test_images_list:
+        if test_place_holder is None:
+            test_place_holder = cv2.imread(i)
+        else:
+            test_place_holder += cv2.imread(i)
+
+    # Get the mean and std dev of train and test 
+    train_mean = np.mean(train_place_holder / 255.0)
+    train_std_dev = np.std(train_place_holder / 255.0)
+    test_mean = np.mean(test_place_holder / 255.0)
+    test_std_dev = np.std(test_place_holder / 255.0)
     
     # Make the train and test dataset
-    train_dataset = MedicalDataset(train_images_list, train_masks_list, ImageAndMasksTransforms())
-    test_dataset  = MedicalDataset(test_images_list, test_masks_list, ImageAndMasksTransforms())
+    train_dataset = MedicalDataset(train_images_list, train_masks_list, ImageAndMasksTransforms(train_mean, train_std_dev, is_train=True))
+    test_dataset  = MedicalDataset(test_images_list, test_masks_list, ImageAndMasksTransforms(test_mean, test_std_dev, hflip_prob=0, vflip_prob=0))
 
     return train_dataset, test_dataset 
 
