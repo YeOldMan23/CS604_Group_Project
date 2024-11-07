@@ -35,17 +35,6 @@ train_dataset, test_dataset = medical_train_eval_split(images_dir, masks_dir, tr
 train_dataloader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 test_dataloader  = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-# Get the normalization factor
-place_holder_img = None
-for batch_idx, (inputs, targets) in enumerate(train_dataloader):
-    if place_holder_img == None:
-        place_holder_img = inputs
-    else:
-        place_holder_img = torch.concatenate((place_holder_img, inputs), dim=0)
-
-mean_value = torch.mean(place_holder_img)
-std_dev = torch.std(place_holder_img)
-
 # Load the model
 model = unet_plus_plus_model
 model.to(device)

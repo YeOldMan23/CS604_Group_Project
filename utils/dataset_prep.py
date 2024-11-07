@@ -112,7 +112,7 @@ def medical_train_eval_split(images_dir, masks_dir, train_split : float = 0.9):
     
     # Make the train and test dataset
     train_dataset = MedicalDataset(train_images_list, train_masks_list, ImageAndMasksTransforms(train_mean, train_std_dev, is_train=True))
-    test_dataset  = MedicalDataset(test_images_list, test_masks_list, ImageAndMasksTransforms(test_mean, test_std_dev, hflip_prob=0, vflip_prob=0))
+    test_dataset  = MedicalDataset(test_images_list, test_masks_list, ImageAndMasksTransforms(train_mean, train_std_dev, hflip_prob=0, vflip_prob=0))
 
     return train_dataset, test_dataset 
 
