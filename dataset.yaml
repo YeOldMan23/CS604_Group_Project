@@ -4,11 +4,21 @@ train: train # train images
 val: test # val images
 
 # Classes (80 COCO classes)
+# names:
+#   0: spleen
+#   1: kidney
+#   2: gallbladder
+#   3: pancreas
+#   4: liver
+#   5: stomach
+#   6: aorta
 names:
-  0: spleen
-  1: kidney
-  2: gallbladder
-  3: pancreas
-  4: liver
-  5: stomach
-  6: aorta
+  0: background
+  1: spleen
+  2: right_kidney
+  3: left_kidney
+  4: gallbladder
+  5: pancreas
+  6: liver
+  7: stomach
+  8: aorta

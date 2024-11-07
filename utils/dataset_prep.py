@@ -40,15 +40,15 @@ class MedicalDataset(Dataset):
             base_mask[:, :, class_index] = class_mask # Adjust for the class encoding
 
         # Combine the left and right kidney into one class kidney, drop background mask
-        output_mask[:, :, 0] = base_mask[:, :, 1]
-        output_mask[:, :, 1] = base_mask[:, :, 2] + base_mask[:, :, 3]
-        output_mask[:, :, 2] = base_mask[:, :, 4]
-        output_mask[:, :, 3] = base_mask[:, :, 5]
-        output_mask[:, :, 4] = base_mask[:, :, 6]
-        output_mask[:, :, 5] = base_mask[:, :, 7]
-        output_mask[:, :, 6] = base_mask[:, :, 8]
+        # output_mask[:, :, 0] = base_mask[:, :, 1]
+        # output_mask[:, :, 1] = base_mask[:, :, 2] + base_mask[:, :, 3]
+        # output_mask[:, :, 2] = base_mask[:, :, 4]
+        # output_mask[:, :, 3] = base_mask[:, :, 5]
+        # output_mask[:, :, 4] = base_mask[:, :, 6]
+        # output_mask[:, :, 5] = base_mask[:, :, 7]
+        # output_mask[:, :, 6] = base_mask[:, :, 8]
 
-        return output_mask
+        return base_mask
     
     def __len__(self):
         return len(self.data_path)

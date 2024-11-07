@@ -24,15 +24,16 @@ def convert_to_yolo_format(mask : np.ndarray) -> list:
 
     # Slice the mask, get all contours of that mask, turn into text
     for class_no in CLASS_ENCODING.keys():
+        class_mask = np.where(mask == class_no, 255, 0)
         # Ignore BG, combine left and right = 1
-        if class_no in [0, 3]:
-            continue
+        # if class_no in [0, 3]:
+        #     continue
         
-        # Combine left and right kidney into 1
-        if class_no == 2:
-            class_mask = np.where(mask == 2, 255, 0) + np.where(mask == 3, 255, 0)
-        else:
-            class_mask = np.where((mask == class_no), 255, 0)
+        # # Combine left and right kidney into 1
+        # if class_no == 2:
+        #     class_mask = np.where(mask == 2, 255, 0) + np.where(mask == 3, 255, 0)
+        # else:
+        #     class_mask = np.where((mask == class_no), 255, 0)
 
         # Get the contours out of mask
         contours, hierarchy = cv2.findContours(class_mask.astype(np.uint8), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -47,7 +48,7 @@ def convert_to_yolo_format(mask : np.ndarray) -> list:
                 else:
                     adjusted_contour.append(str(coord / mask_height))
             
-            mask_dict[adjust_class_no(class_no)] = adjusted_contour
+            mask_dict[class_no] = adjusted_contour
             mask_list.append(mask_dict)
 
     return mask_list

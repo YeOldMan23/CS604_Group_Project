@@ -6,16 +6,16 @@ import torch
 from tabulate import tabulate
 from typing import Union
 
-from .globals import NEW_CLASS_ENCODING
+from .globals import NEW_CLASS_ENCODING, CLASS_ENCODING
 
 def calculate_metrics_by_pixel(pred : torch.Tensor, actual : torch.Tensor, threshold: float = 0.7):
     metrics_dict = {}
 
-    for class_name in NEW_CLASS_ENCODING.keys():
+    for class_name in CLASS_ENCODING.keys():
         metrics_dict[class_name] = {}
 
     # Calculate IoU by class
-    for i in range(len(NEW_CLASS_ENCODING.keys())):
+    for i in range(len(CLASS_ENCODING.keys())):
         pred_class = pred[:, i, :, :]
         acutal_class = actual[:, i, :, :]
 
@@ -46,7 +46,7 @@ def calculate_metrics_by_pixel(pred : torch.Tensor, actual : torch.Tensor, thres
 def print_metrics(metrics_table : dict) -> None:
     metrics_list = []
     for i in metrics_table.keys():
-        class_name = NEW_CLASS_ENCODING[i]
+        class_name = CLASS_ENCODING[i]
 
         class_metrics = [class_name,
                          metrics_table[i]["IoU"],
