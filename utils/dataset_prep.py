@@ -40,15 +40,15 @@ class MedicalDataset(Dataset):
             base_mask[:, :, class_index] = class_mask # Adjust for the class encoding
 
         # Combine the left and right kidney into one class kidney, drop background mask
-        # output_mask[:, :, 0] = base_mask[:, :, 1]
-        # output_mask[:, :, 1] = base_mask[:, :, 2] + base_mask[:, :, 3]
-        # output_mask[:, :, 2] = base_mask[:, :, 4]
-        # output_mask[:, :, 3] = base_mask[:, :, 5]
-        # output_mask[:, :, 4] = base_mask[:, :, 6]
-        # output_mask[:, :, 5] = base_mask[:, :, 7]
-        # output_mask[:, :, 6] = base_mask[:, :, 8]
+        output_mask[:, :, 0] = base_mask[:, :, 1]
+        output_mask[:, :, 1] = base_mask[:, :, 2] + base_mask[:, :, 3]
+        output_mask[:, :, 2] = base_mask[:, :, 4]
+        output_mask[:, :, 3] = base_mask[:, :, 5]
+        output_mask[:, :, 4] = base_mask[:, :, 6]
+        output_mask[:, :, 5] = base_mask[:, :, 7]
+        output_mask[:, :, 6] = base_mask[:, :, 8]
 
-        return base_mask
+        return output_mask
     
     def __len__(self):
         return len(self.data_path)
@@ -111,7 +111,7 @@ def medical_train_eval_split(images_dir, masks_dir, train_split : float = 0.9):
     test_std_dev = np.std(test_place_holder / 255.0)
     
     # Make the train and test dataset
-    train_dataset = MedicalDataset(train_images_list, train_masks_list, ImageAndMasksTransforms(train_mean, train_std_dev, is_train=True))
+    train_dataset = MedicalDataset(train_images_list, train_masks_list, ImageAndMasksTransforms(train_mean, train_std_dev, is_train=False))
     test_dataset  = MedicalDataset(test_images_list, test_masks_list, ImageAndMasksTransforms(train_mean, train_std_dev, hflip_prob=0, vflip_prob=0))
 
     return train_dataset, test_dataset 

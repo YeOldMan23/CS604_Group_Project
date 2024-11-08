@@ -71,6 +71,6 @@ class ImageAndMasksTransforms():
         image = transforms.ToTensor()(image)
 
         # Normalize
-        image = transforms.Normalize(mean = self.mean, std= self.std_dev)(image)
+        # image = transforms.Normalize(mean = self.mean, std= self.std_dev)(image)
 
         return image, mask
